@@ -1,0 +1,55 @@
+
+html,
+body {
+	padding: 0;
+	margin: 0;
+}
+
+div.header {
+	display: flex;
+	position: relative;
+	z-index: 10;
+	height: 3rem;
+}
+
+div.header div {
+	padding: .5rem;
+}
+
+div.header select,
+div.header input {
+	min-width: 16rem;
+}
+
+
+div.container {
+	display: flex;
+	overflow: hidden;
+	/* height: 100vh; */
+	/* margin-top: -10vh; */
+	/* padding-top: 10vh; */
+	left: 0;
+	top: 3rem;
+	bottom: 0;
+	position: absolute;
+	width: 100%;
+	backface-visibility: hidden;
+	will-change: overflow;
+}
+
+div.leftPane,
+div.rightPane {
+	width: 50%;
+	overflow: auto;
+	height: auto;
+	padding: .5rem;
+	-webkit-overflow-scrolling: touch;
+	-ms-overflow-style: none;
+}
+
+div.content {
+	width: 100%;
+	/*border: solid thin red;*/
+	margin: 0;
+	padding: 0;
+}

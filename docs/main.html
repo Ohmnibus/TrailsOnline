@@ -1,0 +1,26 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Trails OnLine</title>
+	<script type="text/javascript" src="https://rawgit.com/nodeca/pako/master/dist/pako_inflate.min.js"></script>
+	<script type="text/javascript" src="script/script.js"></script>
+	<link rel="stylesheet" type="text/css" href="style/style.css">
+</head>
+<body><!--  onload="javascript:onLoad();" -->
+	<div class="header">
+		<div>
+			Quest: <select id="ddlQuestList"></select>
+			Search: <input id="filter" type="text" value="" onkeyup="javascript:filterChanged(this.value);" />
+		</div>
+	</div>
+	<div class="container">
+		<div class="leftPane">
+			<div id="leftPane" class="content">&nbsp;</div>
+		</div>
+		<div class="rightPane">
+			<div id="rightPane" class="content">&nbsp;</div>
+		</div>
+	</div>
+</body>
+</html>
