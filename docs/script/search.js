@@ -12,9 +12,10 @@ onmessage = function (event) {
 	// After doing some processing Posting back the message to the main page
 	var retVal = "";
 	if (entryList) {
-		retVal = "<dl>";
+		//retVal = "<dl>";
 		for (i = entryList.length - 1; i >= 0; i--) {
 			var entry = entryList[i];
+			var item = "";
 
 			//Skip entries of different quest
 			if (entry.idQuest != currentQuest) continue;
@@ -22,13 +23,19 @@ onmessage = function (event) {
 			if (!matchFilter(entry, currentFilter)) continue;
 
 			if (entry.type == ENTRY_TOPIC) {
-				retVal += "<dt><a href=\"javascript:showEntry(" + i + ")\">" + entryList[i].title + "</a></dt>";
+				item += "<dt><a href=\"javascript:showEntry(" + i + ")\">" + entryList[i].title + "</a></dt>";
 			} else {
-				retVal += "<dt><a href=\"javascript:showEntry(" + i + ")\">" + entryList[i].date + "</a></dt>";
+				item += "<dt><a href=\"javascript:showEntry(" + i + ")\">" + entryList[i].date + "</a></dt>";
 			}
-			retVal += "<dd>" + getIncipit(entryList[i]) + "</dd>";
+			item += "<dd>" + getIncipit(entryList[i]) + "</dd>";
+
+			if (entry.type == ENTRY_TOPIC && entry.title.toLowerCase() == currentFilter) {
+				retVal = item + retVal;
+			} else {
+				retVal += item;
+			}
 		}
-		retVal += "</dl>";
+		retVal = "<dl>" + retVal + "</dl>";
 	}
 
 	postMessage(retVal);
@@ -37,7 +44,8 @@ onmessage = function (event) {
 function matchFilter(entry, filter) {
 	if (!filter || filter == null || filter.length == 0) return true;
 
-	return entry.body.toLowerCase().indexOf(filter) > 0;
+	return (entry.type == ENTRY_TOPIC && entry.title.toLowerCase() == filter)
+		|| entry.body.toLowerCase().indexOf(filter) > 0;
 }
 
 function getIncipit(entry) {

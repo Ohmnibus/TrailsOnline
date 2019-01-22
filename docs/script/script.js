@@ -38,7 +38,7 @@ function showEntry(index) {
 	var entry = entryList[index];
 
 	if (entry.type == ENTRY_TOPIC) {
-		rightPane.innerHTML = "<h1>" + entry.title + "</h1>" +
+		rightPane.innerHTML = "<h1><a href=\"javascript:setFilter('" + entry.title + "');\">" + entry.title + "</a></h1>" +
 			"<h3>" + getTagList(entry) + "</h3>" +
 			getHtmlBody(entry);
 	} else {
@@ -61,7 +61,8 @@ function getTagList(entry) {
 	return retVal;
 }
 
-var topicRegex = /\B(\@[a-zA-Z]+\b|\@\".+")(?!;)/gm;
+//var topicRegex = /\B(\@[a-zA-Z]+\b|\@\".+")(?!;)/gm;
+var topicRegex = /\@[0-9a-zA-Z\-\_]+|\@\"[^"\x00-\x1f]+\"?/gm;
 
 function getHtmlBody(entry) {
 	var retVal = "";
@@ -74,24 +75,42 @@ function getHtmlBody(entry) {
 function getTokenizedBody(entry) {
 	var retVal = "";
 	if (entry && entry.body) {
-		//var matches;
-		//var topics = [];
+		var match;
+		var matches = [];
 
-		//while (matches = topicRegex.exec(entry.body)) {
-		//	topics.push(matches[0]);
-		//}
-
-		//retVal = entry.body;
-
-		//HACK!!!
-		retVal = entry.body;
-		if (entry.topics) {
-			for (var i = 0; i < entry.topics.length; i++) {
-				var topic = entry.topics[i];
-				//retVal = retVal.replaceAll(topic, "<a href=\"javascript:setFilter('@&quot;" + topic + "&quot;');return false;\">" + topic + "</a>");
-				retVal = retVal.replaceAll(topic, "<a href=\"javascript:setFilter('" + topic + "');\">" + topic + "</a>");
-			}
+		while (match = topicRegex.exec(entry.body)) {
+			matches.push(match);
 		}
+
+		var lastPos = 0;
+		for (var i = 0; i < matches.length; i++) {
+			match = matches[i];
+			var rawTopic = match[0];
+			var fromChar = 1;
+			var toChar = rawTopic.length;
+			if (rawTopic.startsWith("@\"")) {
+				fromChar++;
+			}
+			if (rawTopic.endsWith("\"")) {
+				toChar--;
+			}
+			var topic = rawTopic.substring(fromChar, toChar);
+
+			retVal += entry.body.substring(lastPos, match.index);
+			retVal += "<a href=\"javascript:setFilter('" + topic + "');\">" + rawTopic + "</a>";
+			lastPos = match.index + rawTopic.length;
+		}
+		retVal += entry.body.substring(lastPos);
+
+		////HACK!!!
+		//retVal = entry.body;
+		//if (entry.topics) {
+		//	for (var i = 0; i < entry.topics.length; i++) {
+		//		var topic = entry.topics[i];
+		//		//retVal = retVal.replaceAll(topic, "<a href=\"javascript:setFilter('@&quot;" + topic + "&quot;');return false;\">" + topic + "</a>");
+		//		retVal = retVal.replaceAll(topic, "<a href=\"javascript:setFilter('" + topic + "');\">" + topic + "</a>");
+		//	}
+		//}
 	}
 	return retVal;
 }
@@ -157,6 +176,7 @@ function initData(resultText) {
 	}
 	refreshQuestList(currentQuest);
 	//refreshEntryList();
+	currentFilter = "x"; //HACK per forzare il primo refresh
 	setFilter("");
 
 	rightPane.innerHTML = "";
@@ -247,8 +267,10 @@ function filterEntryList(data) {
 }
 
 function filterChanged(value) {
-	currentFilter = value;
-	refreshEntryList();
+	if (currentFilter !== value) {
+		currentFilter = value;
+		refreshEntryList();
+	}
 }
 
 function setFilter(value) {

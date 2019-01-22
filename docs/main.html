@@ -11,7 +11,7 @@
 	<div class="header">
 		<div>
 			Quest: <select id="ddlQuestList"></select>
-			Search: <input id="filter" type="text" value="" onkeyup="javascript:filterChanged(this.value);" />
+			Search: <input id="filter" type="search" placeholder="Search..." value="" onkeyup="filterChanged(this.value);" onsearch="filterChanged(this.value);" />
 		</div>
 	</div>
 	<div class="container">
