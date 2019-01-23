@@ -2,25 +2,47 @@
 <html>
 <head>
 	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Trails OnLine</title>
 	<script type="text/javascript" src="https://rawgit.com/nodeca/pako/master/dist/pako_inflate.min.js"></script>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	<link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+	<script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
 	<script type="text/javascript" src="script/script.js"></script>
 	<link rel="stylesheet" type="text/css" href="style/style.css">
 </head>
 <body><!--  onload="javascript:onLoad();" -->
-	<div class="header">
-		<div>
-			Quest: <select id="ddlQuestList"></select>
-			Search: <input id="filter" type="search" placeholder="Search..." value="" onkeyup="filterChanged(this.value);" onsearch="filterChanged(this.value);" />
+	<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+		<header class="mdl-layout__header">
+			<div class="mdl-layout__header-row">
+				<span class="mdl-layout-title mdl-layout--large-screen-only">Quest: </span><span class="mdl-layout-title"><select id="ddlQuestList" class="mdl-textfield__input"></select></span>
+				<div class="mdl-layout-spacer"></div>
+				<div id="inputArea" class="mdl-textfield mdl-js-textfield mdl-textfield--expandable mdl-textfield--floating-label mdl-textfield--align-right">
+					<label class="mdl-button mdl-js-button mdl-button--icon" for="topFilter">
+						<i class="material-icons">search</i>
+					</label>
+					<div class="mdl-textfield__expandable-holder">
+						<input class="mdl-textfield__input" type="search" name="topFilter" id="topFilter" onkeyup="filterChanged(this.value);" onsearch="filterChanged(this.value);" />
+					</div>
+				</div>
+			</div>
+		</header>
+		<div class="mdl-layout__drawer">
+			<span class="mdl-layout__title">Trails</span>
+			<nav class="mdl-navigation">
+				<a class="mdl-navigation__link" href="index.html">Apri nuovo file...</a>
+			</nav>
 		</div>
-	</div>
-	<div class="container">
-		<div class="leftPane">
-			<div id="leftPane" class="content">&nbsp;</div>
-		</div>
-		<div class="rightPane">
-			<div id="rightPane" class="content">&nbsp;</div>
-		</div>
+		<main class="mdl-layout__content">
+			<div class="container">
+				<div class="leftPane">
+					<div id="leftPane" class="content mdl-card">&nbsp;</div>
+				</div>
+				<div class="rightPane">
+					<div id="rightPane" class="content mdl-card">&nbsp;</div>
+				</div>
+			</div>
+		</main>
 	</div>
 </body>
 </html>

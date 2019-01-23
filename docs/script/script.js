@@ -1,6 +1,9 @@
 const ENTRY_NOTE = 0;
 const ENTRY_TOPIC = 1;
 
+const CLASS_IS_FOCUSED = "is-focused";
+const CLASS_HIDE_ON_LARGE = "mdl-layout--large-screen-only";
+
 var mainData;
 var questList;
 var entryList;
@@ -12,6 +15,7 @@ var source = "https://cors-anywhere.herokuapp.com/https://drive.google.com/uc?id
 var driveFileId;
 var leftPane;
 var rightPane;
+var ddlQuestList;
 var inputFilter;
 var currentQuest = -1;
 var currentFilter = null;
@@ -23,7 +27,15 @@ document.addEventListener('DOMContentLoaded', function () {
 function onLoad() {
 	leftPane = document.getElementById("leftPane");
 	rightPane = document.getElementById("rightPane");
-	inputFilter = document.getElementById("filter");
+	ddlQuestList = document.getElementById("ddlQuestList");
+	inputFilter = document.getElementById("topFilter");
+
+	var inputArea = document.getElementById("inputArea");
+	inputArea.mutationObserver = new window.MutationObserver(checkDiff);
+	inputArea.mutationObserver.observe(inputArea, {
+		attributes: true,
+		attributeFilter: ['class']
+	});
 
 	leftPane.innerHTML = "Loading...";
 	rightPane.innerHTML = "";
@@ -33,29 +45,91 @@ function onLoad() {
 	load(driveFileId);
 }
 
+function checkDiff () {
+	if (inputArea.classList.contains(CLASS_IS_FOCUSED)) {
+		ddlQuestList.classList.add(CLASS_HIDE_ON_LARGE);
+	} else {
+		ddlQuestList.classList.remove(CLASS_HIDE_ON_LARGE);
+	}
+}
+
+//const TEMPLATE_ENTRY_TOPIC = "<h1><a href=\"javascript:setFilter('{entryTitle}');\">{entryTitle}</a></h1>" +
+//			"<h3>{entryTagList}</h3>" +
+//			"{entryBody}";
+//const TEMPLATE_ENTRY_NOTE = "<h1>{entryTitle}</h1>" +
+//			"<h3>{entryTagList}</h3>" +
+//			"{entryBody}";
+const TEMPLATE_ENTRY_TOPIC = "<div class=\"card-wide mdl-card mdl-shadow--2dp\">" +
+			"<div class=\"mdl-card__title\">" +
+			"<h2 class=\"mdl-card__title-text\">{entryTitle}</h2>" +
+			"</div>" +
+			"<div class=\"mdl-card__supporting-text\">" +
+			"{entryBody}" +
+			"</div>" +
+			"<div class=\"mdl-card__actions mdl-card--border\">" +
+			"{entryTagList}" + //"<a class=\"mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect\">{entryTagList}</a>" +
+			"</div>" +
+			"<div class=\"mdl-card__menu\">" +
+			"<button class=\"mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect\">" +
+			"<i class=\"material-icons\" onclick=\"setFilter('{entryTitle}');\">filter_list</i>" +
+			"</button>" +
+			"</div>" +
+			"</div>";
+
+const TEMPLATE_ENTRY_NOTE = "<div class=\"card-wide mdl-card mdl-shadow--2dp\">" +
+			"<div class=\"mdl-card__title\">" +
+			"<h2 class=\"mdl-card__title-text\">{entryTitle}</h2>" +
+			"</div>" +
+			"<div class=\"mdl-card__supporting-text\">" +
+			"{entryBody}" +
+			"</div>" +
+			"<div class=\"mdl-card__actions mdl-card--border\">" +
+			"{entryTagList}" +
+			"</div>" +
+			//"<div class=\"mdl-card__menu\">" +
+			//"<button class=\"mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect\">" +
+			//"<i class=\"material-icons\" onclick=\"setFilter('{entryTitle}');\">filter_list</i>" +
+			//"</button>" +
+			//"</div>" +
+			"</div>";
+
+const TEMPLATE_ENTRY_CATEGORY = "<a class=\"mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect\">{entryCategory}</a>";
+const TEMPLATE_ENTRY_TOKEN = "<a href=\"javascript:setFilter('{entryTopic}');\">{entryTopicBody}</a>";
+
 function showEntry(index) {
 	if (!isLoaded) return;
 	var entry = entryList[index];
+	var content;
+	var title;
 
 	if (entry.type == ENTRY_TOPIC) {
-		rightPane.innerHTML = "<h1><a href=\"javascript:setFilter('" + entry.title + "');\">" + entry.title + "</a></h1>" +
-			"<h3>" + getTagList(entry) + "</h3>" +
-			getHtmlBody(entry);
+		//rightPane.innerHTML = "<h1><a href=\"javascript:setFilter('" + entry.title + "');\">" + entry.title + "</a></h1>" +
+		//	"<h3>" + getTagList(entry) + "</h3>" +
+		//	getHtmlBody(entry);
+		content = TEMPLATE_ENTRY_TOPIC;
+		title = entry.title;
 	} else {
-		rightPane.innerHTML = "<h1>" + entry.date + " (" + entry.mission + ")</h1>" +
-			"<h3>" + getTagList(entry) + "</h3>" +
-			getHtmlBody(entry);
+		//rightPane.innerHTML = "<h1>" + entry.date + " (" + entry.mission + ")</h1>" +
+		//	"<h3>" + getTagList(entry) + "</h3>" +
+		//	getHtmlBody(entry);
+		content = TEMPLATE_ENTRY_NOTE;
+		title = entry.date + " (" + entry.mission + ")";
 	}
-	//rightPane.innerHTML += "<pre>" + JSON.stringify(entry) + "</pre>";
+
+	content = content.replaceAll("{entryTitle}", title);
+	content = content.replaceAll("{entryBody}", getHtmlBody(entry));
+	content = content.replaceAll("{entryTagList}", getTagList(entry, ""));
+
+	rightPane.innerHTML = content;
 }
 
-function getTagList(entry) {
+function getTagList(entry, separator) {
 	var sep = "";
 	var retVal = "";
 	if (entry && entry.categories) {
 		for (i = 0; i < entry.categories.length; i++) {
-			retVal += sep + entry.categories[i];
-			sep = ", ";
+			retVal += sep + TEMPLATE_ENTRY_CATEGORY.replace("{entryCategory}", entry.categories[i]);
+			sep = separator;
 		}
 	}
 	return retVal;
@@ -97,7 +171,10 @@ function getTokenizedBody(entry) {
 			var topic = rawTopic.substring(fromChar, toChar);
 
 			retVal += entry.body.substring(lastPos, match.index);
-			retVal += "<a href=\"javascript:setFilter('" + topic + "');\">" + rawTopic + "</a>";
+			//retVal += "<a href=\"javascript:setFilter('" + topic + "');\">" + rawTopic + "</a>";
+			retVal += TEMPLATE_ENTRY_TOKEN.
+				replace("{entryTopic}", topic). //TODO: Escape
+				replace("{entryTopicBody}", rawTopic);
 			lastPos = match.index + rawTopic.length;
 		}
 		retVal += entry.body.substring(lastPos);
@@ -183,9 +260,8 @@ function initData(resultText) {
 }
 
 function refreshQuestList(selected) {
-	var select = document.getElementById("ddlQuestList");
-	for (i = 0; i < select.length; i++) {
-		select.remove(i);
+	for (i = 0; i < ddlQuestList.length; i++) {
+		ddlQuestList.remove(i);
 	}
 	if (!isLoaded) return;
 	if (questList) {
@@ -196,7 +272,7 @@ function refreshQuestList(selected) {
 			if (questList[i].id == selected) {
 				option.selected = true;
 			}
-			select.add(option);
+			ddlQuestList.add(option);
 		}
 	}
 }
