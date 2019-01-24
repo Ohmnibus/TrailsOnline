@@ -12,8 +12,9 @@
 	<link rel="stylesheet" type="text/css" href="style/style.css">
 </head>
 <body><!--  onload="javascript:onLoad();" -->
-	<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+	<div id="mainContainer" class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
 		<header class="mdl-layout__header">
+			<div class="mdl-layout-icon mdl-js-button" onclick="showList();"><i class="material-icons">arrow_back</i></div>
 			<div class="mdl-layout__header-row">
 				<span class="mdl-layout-title mdl-layout--large-screen-only">Quest: </span><span class="mdl-layout-title"><select id="ddlQuestList" class="mdl-textfield__input"></select></span>
 				<div class="mdl-layout-spacer"></div>
@@ -36,13 +37,27 @@
 		<main class="mdl-layout__content">
 			<div class="container">
 				<div class="leftPane">
-					<div id="leftPane" class="content mdl-card">&nbsp;</div>
+					<div id="leftPane" class="content">&nbsp;</div>
 				</div>
 				<div class="rightPane">
-					<div id="rightPane" class="content mdl-card">&nbsp;</div>
+					<div id="rightPane" class="content">&nbsp;</div>
 				</div>
 			</div>
 		</main>
+		<footer class="mdl-mini-footer mdl-layout--large-screen-only">
+			<div class="mdl-mini-footer__left-section">
+				<div class="mdl-logo ">Trails OnLine</div>
+				<ul class="mdl-mini-footer__link-list">
+					<li><a href="https://play.google.com/store/apps/developer?id=Ohmnibus">Ohmnibus on Play Store</a></li>
+					<li><a href="https://www.ohmnibus.net/en/welcome.asp">Ohmnibus.net/en</a></li>
+				</ul>
+			</div>
+			<div class="mdl-mini-footer__right-section">
+				<a href="https://twitter.com/ohmnibus" class="mdl-button mdl-js-button mdl-button--icon mdl-social-button--twitter"></a>
+				<a href="https://www.facebook.com/OhmnibusProductions" class="mdl-button mdl-js-button mdl-button--icon mdl-social-button--facebook"></a>
+				<a href="https://github.com/Ohmnibus/TrailsOnline" class="mdl-button mdl-js-button mdl-button--icon mdl-social-button--github"></a>
+			</div>
+		</footer>
 	</div>
 </body>
 </html>

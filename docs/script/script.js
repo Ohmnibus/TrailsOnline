@@ -3,39 +3,68 @@ const ENTRY_TOPIC = 1;
 
 const CLASS_IS_FOCUSED = "is-focused";
 const CLASS_HIDE_ON_LARGE = "mdl-layout--large-screen-only";
+const CLASS_IS_SMALL_SCREEN = "is-small-screen";
+const CLASS_IS_HIDDEN = "is-hidden";
+const CLASS_IS_DETAIL = "is-detail";
 
+const MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
+const InputDataObserver = new MutationObserver(onInputAreaChanged);
+//const MainContainerObserver = new MutationObserver(onMainContainerChanged);
+
+//const source = "https://drive.google.com/uc?id=<driveFileId>";
+const source = "https://cors-anywhere.herokuapp.com/https://drive.google.com/uc?id=<driveFileId>&export=download";
+//const source = "TdO-Shared.tbk";
+
+//Status variables
 var mainData;
 var questList;
 var entryList;
 
 var isLoaded = false;
-//var source = "https://drive.google.com/uc?id=<driveFileId>";
-var source = "https://cors-anywhere.herokuapp.com/https://drive.google.com/uc?id=<driveFileId>&export=download";
-//var source = "TdO-Shared.tbk";
+var currentQuest = -1;
+var currentItem = -1;
+var currentFilter = null;
+var isSmallScreen = false;
+
+//Reference to elements
 var driveFileId;
 var leftPane;
 var rightPane;
+var leftPaneContainer;
+var rightPaneContainer;
 var ddlQuestList;
 var inputFilter;
-var currentQuest = -1;
-var currentFilter = null;
+var mainContainer;
+
 
 document.addEventListener('DOMContentLoaded', function () {
 	onLoad();
 }, false);
 
 function onLoad() {
+	mainContainer = document.getElementById("mainContainer");
 	leftPane = document.getElementById("leftPane");
+	leftPaneContainer = leftPane.parentElement;
 	rightPane = document.getElementById("rightPane");
+	rightPaneContainer = rightPane.parentElement;
 	ddlQuestList = document.getElementById("ddlQuestList");
 	inputFilter = document.getElementById("topFilter");
 
 	var inputArea = document.getElementById("inputArea");
-	inputArea.mutationObserver = new window.MutationObserver(checkDiff);
-	inputArea.mutationObserver.observe(inputArea, {
+	//Listen to changes in inputArea
+	InputDataObserver.observe(inputArea, {
 		attributes: true,
 		attributeFilter: ['class']
 	});
+
+	//MainContainerObserver.observe(mainContainer, {
+	//	attributes: true,
+	//	attributeFilter: ['class']
+	//});
+
+	var mediaMatcher = window.matchMedia("(max-width: 479px)");
+	onMediaChanged(mediaMatcher);
+	mediaMatcher.addListener(onMediaChanged);
 
 	leftPane.innerHTML = "Loading...";
 	rightPane.innerHTML = "";
@@ -45,7 +74,15 @@ function onLoad() {
 	load(driveFileId);
 }
 
-function checkDiff () {
+function onMediaChanged(mediaMatcher) {
+	isSmallScreen = mediaMatcher.matches;
+	if (isSmallScreen) {
+		mainContainer.classList.remove(CLASS_IS_DETAIL);
+		currentItem = -1;
+	}
+}
+
+function onInputAreaChanged() {
 	if (inputArea.classList.contains(CLASS_IS_FOCUSED)) {
 		ddlQuestList.classList.add(CLASS_HIDE_ON_LARGE);
 	} else {
@@ -53,12 +90,6 @@ function checkDiff () {
 	}
 }
 
-//const TEMPLATE_ENTRY_TOPIC = "<h1><a href=\"javascript:setFilter('{entryTitle}');\">{entryTitle}</a></h1>" +
-//			"<h3>{entryTagList}</h3>" +
-//			"{entryBody}";
-//const TEMPLATE_ENTRY_NOTE = "<h1>{entryTitle}</h1>" +
-//			"<h3>{entryTagList}</h3>" +
-//			"{entryBody}";
 const TEMPLATE_ENTRY_TOPIC = "<div class=\"card-wide mdl-card mdl-shadow--2dp\">" +
 			"<div class=\"mdl-card__title\">" +
 			"<h2 class=\"mdl-card__title-text\">{entryTitle}</h2>" +
@@ -96,11 +127,20 @@ const TEMPLATE_ENTRY_NOTE = "<div class=\"card-wide mdl-card mdl-shadow--2dp\">"
 const TEMPLATE_ENTRY_CATEGORY = "<a class=\"mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect\">{entryCategory}</a>";
 const TEMPLATE_ENTRY_TOKEN = "<a href=\"javascript:setFilter('{entryTopic}');\">{entryTopicBody}</a>";
 
+function showList() {
+	currentItem = -1;
+	mainContainer.classList.remove(CLASS_IS_DETAIL);
+	rightPane.innerHTML = "";
+}
+
 function showEntry(index) {
 	if (!isLoaded) return;
 	var entry = entryList[index];
 	var content;
 	var title;
+
+	currentItem = index;
+	mainContainer.classList.add(CLASS_IS_DETAIL);
 
 	if (entry.type == ENTRY_TOPIC) {
 		//rightPane.innerHTML = "<h1><a href=\"javascript:setFilter('" + entry.title + "');\">" + entry.title + "</a></h1>" +
@@ -344,6 +384,9 @@ function filterEntryList(data) {
 
 function filterChanged(value) {
 	if (currentFilter !== value) {
+		if (isSmallScreen) {
+			showList();
+		}
 		currentFilter = value;
 		refreshEntryList();
 	}

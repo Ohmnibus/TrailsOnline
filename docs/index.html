@@ -2,15 +2,63 @@
 <html>
 <head>
 	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Trails OnLine</title>
+	<!--<link rel="stylesheet" type="text/css" href="style/style.css">-->
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	<link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+	<script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="style/style.css">
 </head>
 <body>
-	<h1>Trails OnLine</h1>
-	<p>Enter the shared datafile</p>
-	<form action="main.html">
-		<input type="text" name="driveFileId"/>
-		<input type="submit" value="Load"/>
-	</form>
+	<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+		<header class="mdl-layout__header">
+			<!--<div class="mdl-layout-icon"></div>-->
+			<div class="mdl-layout__header-row">
+				<span class="mdl-layout__title">Trails OnLine</span>
+			</div>
+		</header>
+		<main class="mdl-layout__content">
+			<form id="mainForm" action="main.html">
+				<div class="mdl-grid">
+					<div class="mdl-cell mdl-cell--12-col">
+						<div class="mdl-card mdl-shadow--4dp" style="width:100%;">
+							<div class="mdl-card__supporting-text">
+								<b>Trails OnLine</b> is an handy viewer to display data created with
+								<a href="https://play.google.com/store/apps/details?id=net.ohmnibus.trails">Trails</a>,
+								the hyperdiary that keep track of your quests - and more.
+							</div>
+							<div class="mdl-card__supporting-text">
+								Enter the ID of the <i>shared datafile</i> (.tbk) to view:
+								<div class="mdl-textfield mdl-js-textfield">
+									<input class="mdl-textfield__input" type="text" id="driveFileId" name="driveFileId">
+									<label class="mdl-textfield__label" for="sample1">Drive File ID...</label>
+								</div>
+							</div>
+							<div class="mdl-card__actions mdl-card--border">
+								<button class="mdl-button mdl-js-button mdl-button--colored mdl-js-ripple-effect" type="submit">
+									Load
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+		</main>
+		<footer class="mdl-mini-footer">
+			<div class="mdl-mini-footer__left-section mdl-layout--large-screen-only">
+				<div class="mdl-logo ">Trails OnLine</div>
+				<ul class="mdl-mini-footer__link-list">
+					<li><a href="https://play.google.com/store/apps/developer?id=Ohmnibus">Ohmnibus on Play Store</a></li>
+					<li><a href="https://www.ohmnibus.net/en/welcome.asp">Ohmnibus.net/en</a></li>
+				</ul>
+			</div>
+			<div class="mdl-mini-footer__right-section">
+				<a href="https://twitter.com/ohmnibus" class="mdl-button mdl-js-button mdl-button--icon mdl-social-button--twitter"></a>
+				<a href="https://www.facebook.com/OhmnibusProductions" class="mdl-button mdl-js-button mdl-button--icon mdl-social-button--facebook"></a>
+				<a href="https://github.com/Ohmnibus/TrailsOnline" class="mdl-button mdl-js-button mdl-button--icon mdl-social-button--github"></a>
+			</div>
+		</footer>
+	</div>
 </body>
 </html>
